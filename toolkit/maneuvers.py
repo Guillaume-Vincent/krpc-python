@@ -59,7 +59,7 @@ def manApoapsis(conn,newPeriapsis,atApsis,tolerance=0.01,leadTime=5):
     mjApo.make_node()
     executeNextNode(conn,tolerance,leadTime)
 
-def opSemiMajorAxis(conn,newSMA,atApsis,tolerance=0.01,leadTime=5):
+def manSemiMajorAxis(conn,newSMA,atApsis,tolerance=0.01,leadTime=5):
     """Changes the semi major axis of the orbit.
 
     Parameters:
@@ -79,3 +79,39 @@ def opSemiMajorAxis(conn,newSMA,atApsis,tolerance=0.01,leadTime=5):
     mj_sma.new_semi_major_axis = newSMA
     mj_sma.make_node()
     execute_next_node(conn,tolerance,leadTime)
+
+def manCircularize(conn,atApsis,tolerance=0.01,leadTime=5):
+    """Circularize the orbit at the desired apsis.
+
+    Parameters:
+    -atApsis : location of the burn ('apoapsis','periapsis')
+    -tolerance : tolerance of the mechjeb node executor (default : 0.01)
+    -leadTime : lead time of warp before burn time (default : 5)
+    """
+    mj = conn.mech_jeb
+    planner = mj.maneuver_planner
+    mjCirc = planner.operation_circularize
+
+    if atApsis == 'apoapsis':
+        mjCirc.time_selector.time_reference = mj.TimeReference.apoapsis
+    elif atApsis == 'periapsis':
+        mjCirc.time_selector.time_reference = mj.TimeReference.periapsis
+    mjCirc.make_node()
+    execute_next_node(conn,tolerance,lead_time)
+
+def manInclination(conn,newInclination=0.0,tolerance=0.01,lead_time=5):
+    """Changes the inclination of the orbit.
+
+    Parameters:
+    -newInclination : the new desiredinclination of the orbit (default : 0.0)
+    -tolerance : tolerance of the mechjeb node executor (default : 0.01)
+    -leadTime : lead time of warp before burn time (default : 5)
+    """
+    mj = conn.mech_jeb
+    planner = mj.maneuver_planner
+    mjInc = planner.operation_inclination
+
+    mjInc.time_selector.time_reference = mj.TimeReference.eq_nearest_ad
+    mjInc.new_inclination = newInclination
+    mjInc.make_node()
+    execute_next_node(conn,tolerance,lead_time)
