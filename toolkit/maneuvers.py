@@ -1,7 +1,7 @@
 import krpc
 from time import sleep
 
-def executeNextNode(conn,tolerance,leadTime):
+def executeNextNode(conn, tolerance, leadTime):
     """Execute the next node.
 
     """
@@ -11,13 +11,13 @@ def executeNextNode(conn,tolerance,leadTime):
     nodeList = conn.add_stream(getattr,vsl.control,'nodes')
 
     executor.tolerance = tolerance
-    executor.lead_time = lead_time
+    executor.lead_time = leadTime
     executor.execute_one_node()
     sleep(1)
     while (executorStatus() is True) or (nodeList() != []):
         pass
 
-def manPeriapsis(conn,newPeriapsis,atApsis,tolerance=0.01,leadTime=5):
+def manPeriapsis(conn, newPeriapsis, atApsis, tolerance=0.01, leadTime=5):
     """Change the periapsis of the orbit.
 
     Parameters:
@@ -38,7 +38,7 @@ def manPeriapsis(conn,newPeriapsis,atApsis,tolerance=0.01,leadTime=5):
     mjPeri.make_node()
     executeNextNode(conn,tolerance,leadTime)
 
-def manApoapsis(conn,newPeriapsis,atApsis,tolerance=0.01,leadTime=5):
+def manApoapsis(conn, newPeriapsis, atApsis, tolerance=0.01, leadTime=5):
     """Change the apoapsis of the orbit.
 
     Parameters:
@@ -59,7 +59,7 @@ def manApoapsis(conn,newPeriapsis,atApsis,tolerance=0.01,leadTime=5):
     mjApo.make_node()
     executeNextNode(conn,tolerance,leadTime)
 
-def manSemiMajorAxis(conn,newSMA,atApsis,tolerance=0.01,leadTime=5):
+def manSemiMajorAxis(conn, newSMA, atApsis, tolerance=0.01, leadTime=5):
     """Changes the semi major axis of the orbit.
 
     Parameters:
@@ -80,7 +80,7 @@ def manSemiMajorAxis(conn,newSMA,atApsis,tolerance=0.01,leadTime=5):
     mj_sma.make_node()
     execute_next_node(conn,tolerance,leadTime)
 
-def manCircularize(conn,atApsis,tolerance=0.01,leadTime=5):
+def manCircularize(conn, atApsis, tolerance=0.01, leadTime=5):
     """Circularize the orbit at the desired apsis.
 
     Parameters:
@@ -97,9 +97,9 @@ def manCircularize(conn,atApsis,tolerance=0.01,leadTime=5):
     elif atApsis == 'periapsis':
         mjCirc.time_selector.time_reference = mj.TimeReference.periapsis
     mjCirc.make_node()
-    execute_next_node(conn,tolerance,lead_time)
+    execute_next_node(conn,tolerance,leadTime)
 
-def manInclination(conn,newInclination=0.0,tolerance=0.01,lead_time=5):
+def manInclination(conn, newInclination=0.0, tolerance=0.01,leadTime=5):
     """Changes the inclination of the orbit.
 
     Parameters:
@@ -114,4 +114,4 @@ def manInclination(conn,newInclination=0.0,tolerance=0.01,lead_time=5):
     mjInc.time_selector.time_reference = mj.TimeReference.eq_nearest_ad
     mjInc.new_inclination = newInclination
     mjInc.make_node()
-    execute_next_node(conn,tolerance,lead_time)
+    execute_next_node(conn,tolerance,leadTime)
