@@ -2,14 +2,41 @@ import krpc
 import math
 from time import sleep
 
-def getOrbitalPeriod(sma,mu):
+def dotproduct(u, v):
+    """Return the dot product of two vectors.
+
+    """
+    dp = u[0]*v[0] + u[1]*v[1] + u[2]*v[2]
+    return dp
+
+def length(u):
+    """Return the length of a vector.
+
+    """
+    len = math.sqrt(dotproduct(u, u))
+    return len
+
+def angle(u, v):
+    """Return the angle between two vectors.
+
+    """
+    rad_angle = math.acos(dotproduct(u, v) / (length(u) * length(v)))
+    return rad_angle * 180.0 / math.pi
+
+def distance(a, b):
+    """Return the distance between two points.
+
+    """
+    return math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
+
+def getOrbitalPeriod(sma, mu):
     """Return the orbital period of a vessel, using the semi major axis.
 
     """
     period = 2 * math.pi * math.sqrt(sma**3 / mu)
     return period
 
-def getSemiMajorAxis(period,mu):
+def getSemiMajorAxis(period, mu):
     """Return the semi major axis of an orbit, using the orbital period.
 
     """
@@ -30,3 +57,27 @@ def getTimeOfAscendingNode(conn):
     sleep(0.1)
     anNode.remove()
     return anUT
+
+def findClosestVessel(conn, vessel=None, sphere=10000):
+    """Return the closest vessel to the vessel in a sphere arroud it.
+
+    If no origin vessel is given, the active vessel will be taken by default.
+    Sphere radius in meters (default : 10000).
+    If no vessel is found in the sphere, returns None.
+    """
+    if vessel is None:
+        vessel = conn.space_center.active_vessel
+
+    vesselList = conn.add_stream(getattr,conn.space_center,'vessels')
+    refFrame = vessel.reference_frame
+    minDist = sphere + 1000
+    closestVessel = None
+
+    for V in vesselList():
+        dist = length(V.position(refFrame))
+        if dist < sphere:
+            if V != vessel and dist < minDist:
+                closestVessel = V
+                minDist = dist
+
+    return closestVessel
