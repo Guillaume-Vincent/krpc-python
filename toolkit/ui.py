@@ -20,8 +20,9 @@ class Panel:
         self.elements = []
 
         #Write the main title of the panel
+        self.title = title
         self.ui = conn.ui
-        self.addText(line=title, size=titleSize,
+        self.addText(line=self.title, size=titleSize,
                      position=(0,panelSize[1]/2 - titleSize/2))
 
         #Use a lineCount to count the number of lines writen in the panel.
@@ -35,6 +36,16 @@ class Panel:
 
     def addText(self, line, size, anchor="middle_center", color=(0,0,0),
                 font='Corbel Bold', position=(0,0)):
+        """Add a new text element to the panel.
+
+        Parameters:
+        -line : the line of text that is to be added
+        -size : the font size used for the text
+        -anchor : alignment of the text (default : "middle_center")
+        -color : color of the text, RGB values up to 255 (default : (0,0,0))
+        -font : font used for the text (default : 'Corbel Bold')
+        -position : position of the center of the text zone (default : (0,0))
+        """
         text = self.panel.add_text(line)
         self.elements.append(text)
 
@@ -56,6 +67,9 @@ class Panel:
         text.color = tuple([c/255 for c in color])
 
     def addLine(self, line, color=(0,0,0)):
+        """Add a preformatted line to the panel, below the previous one.
+
+        """
         self.lineCount += 1
         linePos = (0,self.firstLinePos - self.lineCount*self.defaultTextSize -\
                    self.lineCount*self.defaultSpacing)
@@ -63,10 +77,16 @@ class Panel:
                      position=linePos)
 
     def remove(self):
+        """Remove all the elements created in this class.
+
+        """
         self.panel.remove()
         self.canvas.remove()
         for elem in self.elements:
             elem.remove()
+
+    def __repr__(self):
+        return ("<Panel : " + self.title + ">")
 
 conn = krpc.connect(address='192.168.1.27')
 vessel = conn.space_center.active_vessel
@@ -75,6 +95,7 @@ exitCondition = conn.add_stream(getattr,vessel.control,'throttle')
 mainMenu = Panel(conn, (500,750), (0,0), 20, 25, 'Main Menu', 50)
 for n in range(0,15):
     mainMenu.addLine("Hello, this is line n°" + str(n+1))
+print(mainMenu)
 
 while exitCondition() == 0.0:
     pass
