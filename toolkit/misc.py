@@ -1,23 +1,21 @@
-import krpc
+"""Regroup all miscellanous functions."""
+
 
 def countdown(conn, t):
-    """Create a t-seconds countdown.
-
-    """
-    ut = conn.add_stream(getattr,conn.space_center,'ut')
+    """Create a t-seconds countdown."""
+    ut = conn.add_stream(getattr, conn.space_center, 'ut')
     T = ut() + 1
 
-    for i in range(t,0,-1):
+    for i in range(t, 0, -1):
         conn.ui.message("%d" % i)
         while ut() < T:
             pass
         T += 1
     ut.remove()
 
-def convertTime(ut):
-    """Convert a time in seconds to a Y D HH:MM:SS format (KSP game time).
 
-    """
+def convertTime(ut):
+    """Convert a time in seconds to a Y D HH:MM:SS format (KSP game time)."""
     ut_s = int(ut)
     ut_m = int(ut_s / 60)
     ut_h = int(ut_m / 60)
@@ -37,19 +35,17 @@ def convertTime(ut):
 
     return (Y + " " + D + " " + HH + ":" + MM + ":" + SS)
 
-def targetBody(conn, body):
-    """Target the desired body.
 
-    """
+def targetBody(conn, body):
+    """Target the desired body."""
     for n in conn.space_center.bodies:
         if n == body:
             conn.space_center.target_body = conn.space_center.bodies.get(n)
     return conn.space_center.target_body
 
-def findVessel(conn, vesselName):
-    """Return the first vessel that has the given name.
 
-    """
+def findVessel(conn, vesselName):
+    """Return the first vessel that has the given name."""
     for V in conn.space_center.vessels:
         if V.name == vesselName:
             return V
