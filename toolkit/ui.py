@@ -3,7 +3,7 @@ import krpc
 class Panel:
     """Create a panel and its components.
 
-    Can add text to the panel.
+    Can add free or preformatted text to the panel.
     """
     def __init__(self, conn, panelSize, panelPosition,
                  defaultTextSize, defaultSpacing, title, titleSize):
@@ -18,6 +18,10 @@ class Panel:
 
         #Regroup all the elements (text, buttons, ...) of the panel
         self.elements = []
+
+        #Dictionary for the buttons and for the input fields of the panel
+        self.buttons = {}
+        self.fields= {}
 
         #Write the main title of the panel
         self.title = title
@@ -65,6 +69,36 @@ class Panel:
         text.font = font
         text.size = size
         text.color = tuple([c/255 for c in color])
+
+    def addButton(self, name, text, size, position):
+        """Add a button to the panel.
+
+        Parameters:
+        -name : identifier for the button
+        -text : text written inside the button
+        -size : size of the button
+        -position : position of the button
+        """
+        button = self.panel.add_button(text)
+        self.buttons[name] = button
+
+        button.rect_transform.size = size
+        button.rect_transform.position = position
+        button.text = text
+
+    def addInputField(self, name, size, position):
+        """Add an input field to the panel.
+
+        Parameters:
+        -name : identifier for the field
+        -size : size of the field
+        -position : position of the field
+        """
+        inputField = self.panel.add_input_field()
+        self.fields[name] = button
+
+        inputField.rect_transform.size = size
+        inputField.rect_transform.position = position
 
     def addLine(self, line, color=(0,0,0)):
         """Add a preformatted line to the panel, below the previous one.
