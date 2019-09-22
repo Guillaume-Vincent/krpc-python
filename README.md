@@ -1,10 +1,12 @@
 # krpc-python
 Python scripts using [kRPC](https://github.com/krpc/krpc) to control vessels in [Kerbal Space Program](https://www.kerbalspaceprogram.com/).
+
 *Temporary: This repository will also be used to evaluate activity 2 of the OpenClassrooms course about Git & GitHub.*
 
 
 ## Toolkit
 The toolkit folder contains all the necessary code that will be used in the main program.
+
 
 ## Task list
 - [x] Write the basic functions used to control the vessel
