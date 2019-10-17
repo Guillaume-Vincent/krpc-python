@@ -1,4 +1,5 @@
 """Regroup all the functions related to a vessel and its parts."""
+from toolkit.calculations import getKerbinLocalGravity
 
 
 def deployAntennas(vessel):
@@ -50,3 +51,25 @@ def vesselChangeType(vessel, vesselType):
 def vesselChangeName(vessel, vesselName):
     """Change the name of the vessel."""
     vessel.name = vesselName
+
+
+def twrRegulation(vessel, meanAltitude, thrust, vesselMass, throttle, twrMax):
+    """Adjust the throttle of the vessel to match the desired max twr.
+
+    Args:
+    -vessel : the vessel that is beeing controlled
+    -meanAltitude : stream of the mean altitude of the vessel
+    -thrust : stream of the thrust of the vessel
+    -vesselMass : stream of the mass of the vessel
+    -throttle : stream of the throttle of the vessel
+    -twrMax : desired maximum twr
+
+    """
+    localGravity = getKerbinLocalGravity(meanAltitude())
+    twr = thrust() / (vessel_mass() * localGravity)
+
+    if (twr - 0.01) > twrMax:
+        vessel.control.throttle -= abs(twr - twrMax) / 10
+
+    if ((twr + 0.01) < twrMax) and (throttle() < 1.0):
+        vessel.control.throttle += abs(twr - twrMax) / 10
