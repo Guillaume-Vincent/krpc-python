@@ -33,6 +33,14 @@ def getOrbitalPeriod(sma, mu):
     return period
 
 
+def getKerbinLocalGravity(meanAltitude):
+    """Return the local gravity seen by a vessel arround Kerbin."""
+    g = 9.81
+    R = 600000.0
+    localGravity = g * (R / (R + meanAltitude)**2)
+    return localGravity
+
+
 def getSemiMajorAxis(period, mu):
     """Return the semi major axis of an orbit, using the orbital period."""
     sma = ((mu * period**2) / (4 * math.pi**2)) ** (1 / 3)
