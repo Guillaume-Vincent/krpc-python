@@ -5,6 +5,9 @@ Python scripts using [kRPC](https://github.com/krpc/krpc) to control vessels in 
 ## Toolkit
 The toolkit folder contains all the necessary code that will be used in the main program.
 
+## Craft Files
+The craft-files folder contains all the .craft files that are used in the different missions.
+
 
 ## Task list
     -  [x] Write the basic functions used to control the vessel
