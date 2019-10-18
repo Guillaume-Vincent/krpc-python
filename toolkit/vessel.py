@@ -1,7 +1,6 @@
 """Regroup all the functions related to a vessel and its parts."""
 from toolkit.calculations import getKerbinLocalGravity
 
-
 def deployAntennas(vessel):
     """Deploy each deployable antenna on the vessel."""
     for antenna in vessel.parts.antennas:
@@ -82,3 +81,38 @@ def twrRegulation(vessel, meanAltitude, thrust, vesselMass, throttle, twrMax):
 
         if ((twr + 0.01) < twrMax) and (throttle() < 1.0):
             vessel.control.throttle += abs(twr - twrMax) / 10
+
+
+def vesselDeorbit(conn, vessel):
+    """Deorbit the vessel and change its type to debris."""
+    ut = conn.add_stream(getattr, conn.space_center, 'ut')
+    thrust = conn.add_stream(getattr, vessel, 'thrust')
+    periapsisAlt = conn.add_stream(getattr, vessel.orbit, 'periapsis_altitude')
+
+    vessel.control.rcs = True
+    vessel.control.sas = True
+
+    ut0 = ut()
+    vessel.control.forward = -1.0
+    while ut() < (ut0 + 10.0):
+        pass
+    vessel.control.rcs = False
+
+    ut0 = ut()
+    vessel.control.sas_mode = conn.space_center.SASMode.retrograde
+    while ut() < (ut0 + 10.0):
+        pass
+    vessel.control.throttle = 1.0
+
+    while thrust() == 0.0:
+        pass
+    while (periapsisAlt() > -25000.0) and (thrust() != 0.0):
+        pass
+    vessel.control.throttle = 0.0
+
+    vesselChangeType(vessel, conn.space_center.VesselType.debris)
+    vesselChangeName(vessel, vessel.name+"-debris")
+
+    ut.remove()
+    thrust.remove()
+    periapsisAlt.remove()
