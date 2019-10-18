@@ -1,6 +1,7 @@
 """Regroup all the functions related to a vessel and its parts."""
 from toolkit.calculations import getKerbinLocalGravity
 
+
 def deployAntennas(vessel):
     """Deploy each deployable antenna on the vessel."""
     for antenna in vessel.parts.antennas:
