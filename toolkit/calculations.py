@@ -37,7 +37,7 @@ def getKerbinLocalGravity(meanAltitude):
     """Return the local gravity seen by a vessel arround Kerbin."""
     g = 9.81
     R = 600000.0
-    localGravity = g * (R / (R + meanAltitude)**2)
+    localGravity = g * (R / (R + meanAltitude))**2
     return localGravity
 
 
