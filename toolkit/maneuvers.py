@@ -11,10 +11,12 @@ def executeNextNode(conn, tolerance, leadTime):
     executor.tolerance = tolerance
     executor.lead_time = leadTime
     executor.execute_one_node()
-
+    
     while (executorStatus() is True) or (nodeList() != []):
         pass
 
+    executorStatus.remove()
+    nodeList.remove()
 
 def manPeriapsis(conn, newPeriapsis, atApsis, tolerance=0.01, leadTime=5):
     """Change the periapsis of the orbit.
