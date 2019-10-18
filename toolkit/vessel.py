@@ -25,6 +25,12 @@ def deployRadiators(vessel):
             rad.part.modules[0].trigger_event('Activate Radiator')
 
 
+def deployFairing(vessel):
+    """Deploy the fairing of the vessel."""
+    for f in vessel.parts.fairings:
+        f.jettison()
+
+
 def getPartsByName(vessel, partName):
     """Return a list of all the parts named 'partName' of the vessel."""
     partList = []
@@ -66,10 +72,13 @@ def twrRegulation(vessel, meanAltitude, thrust, vesselMass, throttle, twrMax):
 
     """
     localGravity = getKerbinLocalGravity(meanAltitude())
-    twr = thrust() / (vessel_mass() * localGravity)
+    twr = thrust() / (vesselMass() * localGravity)
 
-    if (twr - 0.01) > twrMax:
-        vessel.control.throttle -= abs(twr - twrMax) / 10
+    if twrMax == 0.0:
+        vessel.control.throttle = 0.0
+    else:
+        if (twr - 0.01) > twrMax:
+            vessel.control.throttle -= abs(twr - twrMax) / 10
 
-    if ((twr + 0.01) < twrMax) and (throttle() < 1.0):
-        vessel.control.throttle += abs(twr - twrMax) / 10
+        if ((twr + 0.01) < twrMax) and (throttle() < 1.0):
+            vessel.control.throttle += abs(twr - twrMax) / 10
