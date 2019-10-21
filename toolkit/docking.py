@@ -16,19 +16,19 @@ def xPosControl(vessel, xTarg, xPos, xVlc, vcu):
     """
     if xPos < (xTarg - 0.1):
         if xVlc < 1.0:
-            vessel.control.up = 0.1
+            vessel.control.up = 0.5
         elif vcu != 0.0:
             vessel.control.up = 0.0
     elif xPos > (xTarg + 0.1):
         if xVlc > -1.0:
-            vessel.control.up = -0.1
+            vessel.control.up = -0.5
         elif vcu != 0.0:
             vessel.control.up = 0.0
     else:
         if xVlc > 0.05:
-            vessel.control.up = -0.2
+            vessel.control.up = -1.0
         elif xVlc < -0.05:
-            vessel.control.up = 0.2
+            vessel.control.up = 1.0
         elif vcu != 0.0:
             vessel.control.up = 0.0
 
@@ -46,19 +46,19 @@ def yPosControl(vessel, yTarg, yPos, yVlc, vcf):
     """
     if yPos < (yTarg - 0.1):
         if yVlc < 1.0:
-            vessel.control.forward = -0.1
+            vessel.control.forward = -0.5
         elif vcf != 0.0:
             vessel.control.forward = 0.0
     elif yPos > (yTarg + 0.1):
         if yVlc > -1.0:
-            vessel.control.forward = 0.1
+            vessel.control.forward = 0.5
         elif vcf != 0.0:
             vessel.control.forward = 0.0
     else:
         if yVlc > 0.05:
-            vessel.control.forward = 0.2
+            vessel.control.forward = 1.0
         elif yVlc < -0.05:
-            vessel.control.forward = -0.2
+            vessel.control.forward = -1.0
         elif vcf != 0.0:
             vessel.control.forward = 0.0
 
@@ -76,19 +76,19 @@ def zPosControl(vessel, zTarg, zPos, zVlc, vcr):
     """
     if zPos < (zTarg - 0.1):
         if zVlc < 1.0:
-            vessel.control.right = -0.1
+            vessel.control.right = -0.5
         elif vcr != 0.0:
             vessel.control.right = 0.0
     elif zPos > (zTarg + 0.1):
         if zVlc > -1.0:
-            vessel.control.right = 0.1
-        elif vcr() != 0.0:
+            vessel.control.right = 0.5
+        elif vcr != 0.0:
             vessel.control.right = 0.0
     else:
         if zVlc > 0.05:
-            vessel.control.right = 0.2
+            vessel.control.right = 1.0
         elif zVlc < -0.05:
-            vessel.control.right = -0.2
+            vessel.control.right = -1.0
         elif vcr != 0.0:
             vessel.control.right = 0.0
 
@@ -136,7 +136,7 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
 
     targetObtRefFrame = target.orbital_reference_frame
     refFrame = sc.ReferenceFrame.create_hybrid(
-        targetObtRefFrame, targetDP.reference_frame,
+        targetDP.reference_frame, targetDP.reference_frame,
         targetObtRefFrame, targetDP.reference_frame)
 
     ut = conn.add_stream(getattr, sc, 'ut')
@@ -148,20 +148,17 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
     DPState = conn.add_stream(getattr, vesselDP, "state")
 
     vesselAP = vessel.auto_pilot
-    # vesselAP.time_to_peak = (2.0, 2.0, 2.0)
-    # vesselAP.deceleration_time = (60.0, 60.0, 60.0)
-    # vesselAP.attenuation_angle = (3.0, 3.0, 3.0)
-    # vesselAP.reference_frame = refFrame
+    vesselAP.reference_frame = refFrame
     vesselAP.target_direction = (0, -1, 0)
     vesselAP.target_roll = 0
     vesselAP.engage()
 
     ut0 = ut()
+    vessel.control.rcs = True
     while ut() < (ut0 + 10.0):
         pass
-    vessel.control.rcs = True
 
-    # Station avoidace system
+    # Station avoidace system RAJOUTER LE TIMER
     if vPos()[1] < 0:
         var = {abs(vPos()[0]): 'x', abs(vPos()[2]): 'z'}
         maxPos = var.get(max(var))
@@ -173,14 +170,16 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
             zTarg = 40.0 * sign(vPos()[2])
         yTarg = 0.0
 
-    xLocked = False
-    yLocked = False
-    zLocked = False
-    while (xLocked is False) or (yLocked is False) and (zLocked is False):
-        xPosControl(vessel, xTarg, vPos()[0], vVlc()[0], vcu())
-        yPosControl(vessel, yTarg, vPos()[1], vVlc()[1], vcf())
-        zPosControl(vessel, zTarg, vPos()[2], vVlc()[2], vcr())
-        (xLocked, yLocked, zLocked) = lockedPos((xTarg, yTarg, zTarg), vPos())
+        timer = ut()
+        while timer > (ut() - 1):
+            xPosControl(vessel, xTarg, vPos()[0], vVlc()[0], vcu())
+            yPosControl(vessel, yTarg, vPos()[1], vVlc()[1], vcf())
+            zPosControl(vessel, zTarg, vPos()[2], vVlc()[2], vcr())
+            (xLocked, yLocked, zLocked) = lockedPos((xTarg, yTarg, zTarg),
+                                                    vPos())
+
+            if (xLocked is False) or (yLocked is False) or (zLocked is False):
+                timer = ut()
 
     # Positionning in front of target DP
     timer = ut()
@@ -197,8 +196,8 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
             timer = ut()
 
     while DPState() != sc.DockingPortState.docking:
-        xPosControl(xTarg)
-        zPosControl(zTarg)
+        xPosControl(vessel, xTarg, vPos()[0], vVlc()[0], vcu())
+        zPosControl(vessel, zTarg, vPos()[2], vVlc()[2], vcr())
 
         if vVlc()[1] > -0.8:
             vessel.control.forward = 0.2
