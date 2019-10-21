@@ -13,4 +13,4 @@ The craft-files folder contains all the .craft files that are used in the differ
     -  [x] Write the basic functions used to control the vessel
     -  [x] Write the code related to UI creation and management
     -  [ ] Add the mission files (1/6)
-    -  [ ] Add the .craft files (1/6)
+    -  [ ] Add the .craft files (2/6)
