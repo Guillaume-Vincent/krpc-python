@@ -21,7 +21,7 @@ from toolkit.vessel import twrRegulation, getPartsByName, getPartsByTag,\
 from toolkit.maneuvers import manPeriapsis, manInclination
 
 
-def ascent_guidance():
+def ascentGuidance():
     """Control the ascent guidance."""
     ap.target_pitch_and_heading(90.0, 30.0)
     ap.target_roll = 90.0
@@ -98,14 +98,14 @@ def ascent_guidance():
     activeEngine.engine.thrust_limit = 1.0
 
 
-def reach_orbit():
+def reachOrbit():
     """Control the vessel to reach the correct orbit."""
     manPeriapsis(conn, newPeriapsis=tgtPeri, atApsis='apoapsis')
     manInclination(conn, newInclination=60.0, tolerance=0.001)
     sleep(1.0)
 
 
-def release_payload():
+def releasePayload():
     """Release the payload and deorbit second stage."""
     for D in vessel.parts.docking_ports:
         if D.state is sc.DockingPortState.docked:
@@ -119,9 +119,9 @@ def launch():
     vessel.control.throttle = 1.0
     vessel.control.activate_next_stage()
     sleep(1.0)
-    ascent_guidance()
-    reach_orbit()
-    release_payload()
+    ascentGuidance()
+    reachOrbit()
+    releasePayload()
 
     ESS = findVessel(conn, "ESS-01 Station")
     if ESS is not None:
