@@ -126,3 +126,20 @@ def manInclination(conn, newInclination=0.0, tolerance=0.01, leadTime=5):
     mjInc.new_inclination = newInclination
     mjInc.make_node()
     executeNextNode(conn, tolerance, leadTime)
+
+
+def manPlane(conn, tolerance=0.01, leadTime=5):
+    """Match plane with current target (error if no target selected).
+
+    Args:
+    -tolerance : tolerance of the mechjeb node executor (default : 0.01)
+    -leadTime : lead time of warp before burn time (default : 5)
+
+    """
+    mj = conn.mech_jeb
+    planner = mj.maneuver_planner
+    mjPlan = planner.operation_plane
+
+    mjPlan.time_selector.time_reference = mj.TimeReference.rel_nearest_ad
+    mjPlan.make_node()
+    executeNextNode(conn, tolerance, leadTime)
