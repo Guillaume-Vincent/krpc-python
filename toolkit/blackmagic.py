@@ -6,13 +6,15 @@ It works, but I don't know why.
 """
 
 
-def vesselOnTargetPlane(sc, vessel, target):
+def vesselOnTargetPlane(conn, vessel, target):
     """Wit for vessel and target to be on the same plane.
 
     Also return the direction "north"/"south" you must go in order to reach
     the target.
 
     """
+    sc = conn.space_center
+
     vrf = vessel.reference_frame
     torf = target.orbital_reference_frame
 
@@ -22,19 +24,24 @@ def vesselOnTargetPlane(sc, vessel, target):
     # (transdir[1] == 0) --> plane match
     #   (transdir[0] >= 0) --> need to go south
     #   (transdir[0] <= 0) --> need to go north
+    rwf = conn.add_stream(getattr, sc, 'rails_warp_factor')
+    transdir = conn.add_stream(sc.transform_direction, (0, 0, 1), RF, vrf)
     while True:
-        transdir = sc.transform_direction((0, 0, 1), RF, vrf)
-        if abs(transdir[1]) > 0.2:
-            sc.rails_warp_factor = 5
-        elif abs(transdir[1]) > 0.01:
-            sc.rails_warp_factor = 4
-        elif abs(transdir[1]) > 0.005:
-            sc.rails_warp_factor = 3
+        if abs(transdir()[1]) > 0.2:
+            if rwf() != 5:
+                sc.rails_warp_factor = 5
+        elif abs(transdir()[1]) > 0.01:
+            if rwf() != 4:
+                sc.rails_warp_factor = 4
+        elif abs(transdir()[1]) > 0.005:
+            if rwf() != 3:
+                sc.rails_warp_factor = 3
         else:
             sc.rails_warp_factor = 0
+            sc.physics_warp_factor = 0
             break
 
-    if transdir[0] > 0:
+    if transdir()[0] > 0:
         return "south"
     else:
         return "north"
