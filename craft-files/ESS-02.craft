@@ -2,7 +2,7 @@ ship = ESS-02
 version = 1.5.1
 description = 
 type = VAB
-size = 5.06377029,43.2177811,5.07774258
+size = 5.06374264,43.2177811,5.0723238
 steamPublishedFileId = 0
 persistentId = 4255162889
 rot = 0,0,0,0
@@ -2969,6 +2969,8 @@ PART
 	modMass = 0
 	modSize = 0,0,0
 	link = Size3SmallTank_4294383770
+	link = launchClamp1_4290623288
+	link = launchClamp1_4290620996
 	attN = top,Size3SmallTank_4294383770_0|3.74|0
 	attN = bottom,Decoupler.3_4289194852_0|-3.74|0
 	EVENTS
@@ -7877,6 +7879,280 @@ PART
 	MODULE
 	{
 		name = CModuleStrut
+		isEnabled = True
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = KOSNameTag
+		isEnabled = True
+		nameTag = 
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = ModuleB9PropagateCopyEvents
+		isEnabled = False
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+}
+PART
+{
+	part = launchClamp1_4290623288
+	partName = Part
+	persistentId = 1749126089
+	pos = 0.354184508,20.312191,-3.80605412
+	attPos = 0,0,0
+	attPos0 = -2.98023224E-08,-4.5812788,2.66375923
+	rot = 9.84992887E-09,-5.90946208E-08,1,5.82077812E-16
+	attRot = 0,0,0,1
+	attRot0 = -5.82077812E-16,1,5.90946208E-08,9.84992887E-09
+	mir = 1,1,1
+	symMethod = Radial
+	autostrutMode = Off
+	rigidAttachment = False
+	istg = 2
+	resPri = 0
+	dstg = 4
+	sidx = 1
+	sqor = 2
+	sepI = 2
+	attm = 1
+	modCost = 0
+	modMass = 0
+	modSize = 0,0,0
+	sym = launchClamp1_4290620996
+	srfN = srfAttach,Size3LargeTank_4294402464
+	EVENTS
+	{
+	}
+	ACTIONS
+	{
+	}
+	PARTDATA
+	{
+	}
+	MODULE
+	{
+		name = LaunchClamp
+		isEnabled = True
+		scaleFactor = 7.31196594
+		height = 18.4495296
+		stagingEnabled = True
+		towerRot = -9.84992887E-09,5.90946208E-08,-1,5.82077812E-16
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+			ReleaseClamp
+			{
+				actionGroup = None
+			}
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = ModuleGenerator
+		isEnabled = True
+		generatorIsActive = False
+		throttle = 0
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+			ToggleAction
+			{
+				actionGroup = None
+				active = False
+			}
+			ActivateAction
+			{
+				actionGroup = None
+				active = False
+			}
+			ShutdownAction
+			{
+				actionGroup = None
+				active = False
+			}
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = ModuleTestSubject
+		isEnabled = True
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = KOSNameTag
+		isEnabled = True
+		nameTag = 
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = ModuleB9PropagateCopyEvents
+		isEnabled = False
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+}
+PART
+{
+	part = launchClamp1_4290620996
+	partName = Part
+	persistentId = 804977370
+	pos = 0.35418433,20.312191,1.52146447
+	attPos = 0,0,0
+	attPos0 = -2.08616257E-07,-4.5812788,-2.66375923
+	rot = -1,2.00103E-15,-3.38614612E-08,-5.90946208E-08
+	attRot = 0,0,0,1
+	attRot0 = 5.90946208E-08,-3.38614612E-08,-2.00103E-15,-1
+	mir = 1,1,1
+	symMethod = Radial
+	autostrutMode = Off
+	rigidAttachment = False
+	istg = 2
+	resPri = 0
+	dstg = 4
+	sidx = 1
+	sqor = 2
+	sepI = 2
+	attm = 1
+	modCost = 0
+	modMass = 0
+	modSize = 0,0,0
+	sym = launchClamp1_4290623288
+	srfN = srfAttach,Size3LargeTank_4294402464
+	EVENTS
+	{
+	}
+	ACTIONS
+	{
+	}
+	PARTDATA
+	{
+	}
+	MODULE
+	{
+		name = LaunchClamp
+		isEnabled = True
+		scaleFactor = 7.31196594
+		height = 18.4495296
+		stagingEnabled = True
+		towerRot = 1,-2.00103E-15,3.38614612E-08,-5.90946208E-08
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+			ReleaseClamp
+			{
+				actionGroup = None
+			}
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = ModuleGenerator
+		isEnabled = True
+		generatorIsActive = False
+		throttle = 0
+		stagingEnabled = True
+		EVENTS
+		{
+		}
+		ACTIONS
+		{
+			ToggleAction
+			{
+				actionGroup = None
+				active = False
+			}
+			ActivateAction
+			{
+				actionGroup = None
+				active = False
+			}
+			ShutdownAction
+			{
+				actionGroup = None
+				active = False
+			}
+		}
+		UPGRADESAPPLIED
+		{
+		}
+	}
+	MODULE
+	{
+		name = ModuleTestSubject
 		isEnabled = True
 		stagingEnabled = True
 		EVENTS
