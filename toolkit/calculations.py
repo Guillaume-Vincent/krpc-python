@@ -27,6 +27,12 @@ def distance(a, b):
     return math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
 
 
+def relativeError(realValue, targetValue):
+    """Return the relative error between real and the theoretical value."""
+    relErr = (realValue - targetValue) / abs(targetValue)
+    return relErr
+
+
 def getOrbitalPeriod(sma, mu):
     """Return the orbital period of a vessel, using the semi major axis."""
     period = 2 * math.pi * math.sqrt(sma**3 / mu)
