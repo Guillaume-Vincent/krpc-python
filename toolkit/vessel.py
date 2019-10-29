@@ -89,7 +89,7 @@ def vesselDeorbit(conn, vessel):
     ut = conn.add_stream(getattr, conn.space_center, 'ut')
     thrust = conn.add_stream(getattr, vessel, 'thrust')
     periapsisAlt = conn.add_stream(getattr, vessel.orbit, 'periapsis_altitude')
-
+    vessel.control.speed_mode = conn.space_center.SpeedMode.orbit
     vessel.control.rcs = True
     vessel.control.sas = True
 
