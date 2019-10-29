@@ -16,9 +16,9 @@ Craft file >>> "ESS-01.craft"
 import krpc
 from time import sleep
 from toolkit.misc import findVessel
-from toolkit.vessel import twrRegulation, getPartsByName, getPartsByTag,\
-    deployFairing, vesselDeorbit, vesselChangeName, vesselChangeType
-from toolkit.maneuvers import manPeriapsis, manInclination
+from toolkit.vessel import deployFairing, getPartsByName, getPartsByTag,\
+    twrRegulation, vesselChangeName, vesselDeorbit, vesselChangeType
+from toolkit.maneuvers import manCircularize, manInclination, manPeriapsis
 
 
 def ascentGuidance():
@@ -51,13 +51,13 @@ def ascentGuidance():
     secEngine = getPartsByTag(vessel, 'Second Engine')[0]
     activeEngine = mainEngine
 
-    while apoapsisAlt() < tgtApo:
+    while apoapsisAlt() < tgtobt:
 
-        if (meanAltitude() < 70000.0) and (apoapsisAlt() < 0.95 * tgtApo):
+        if (meanAltitude() < 70000.0) and (apoapsisAlt() < 0.95 * tgtobt):
             twrMax = 2.5
-        elif (meanAltitude() > 70000.0) and (apoapsisAlt() < 0.95 * tgtApo):
+        elif (meanAltitude() > 70000.0) and (apoapsisAlt() < 0.95 * tgtobt):
             twrMax = 1.5
-        elif apoapsisAlt() < tgtApo:
+        elif apoapsisAlt() < tgtobt:
             twrMax = 0.2
         elif meanAltitude() < 70000.0:
             twrMax = 0.0
@@ -80,7 +80,7 @@ def ascentGuidance():
             fairingDeployed = True
 
         if reached95 is False:
-            if apoapsisAlt() > (0.95 * tgtApo):
+            if apoapsisAlt() > (0.95 * tgtobt):
                 activeEngine.engine.thrust_limit = 0.05
                 reached95 = True
 
@@ -100,7 +100,8 @@ def ascentGuidance():
 
 def reachOrbit():
     """Control the vessel to reach the correct orbit."""
-    manPeriapsis(conn, newPeriapsis=tgtPeri, atApsis='apoapsis')
+    manPeriapsis(conn, tgtobt, atApsis='apoapsis', tolerance=0.001)
+    manCircularize(conn, atApsis='periapsis', tolerance=0.001)
     manInclination(conn, newInclination=60.0, tolerance=0.001)
     sleep(1.0)
 
@@ -151,7 +152,6 @@ vesselMass = conn.add_stream(getattr, vessel, 'mass')
 apoapsisAlt = conn.add_stream(getattr, vessel.orbit, 'apoapsis_altitude')
 meanAltitude = conn.add_stream(getattr, vessel.flight(), 'mean_altitude')
 
-tgtApo = 500000.0
-tgtPeri = 500000.0
+tgtobt = 500000.0
 
 launch()
