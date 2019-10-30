@@ -143,3 +143,14 @@ def manPlane(conn, tolerance=0.01, leadTime=5):
     mjPlan.time_selector.time_reference = mj.TimeReference.rel_nearest_ad
     mjPlan.make_node()
     executeNextNode(conn, tolerance, leadTime)
+
+
+def manKillRelVel(conn, tolerance=0.01, leadTime=5):
+    """Kill relative velocity to the target (error if none selected)."""
+    mj = conn.mech_jeb
+    planner = mj.maneuver_planner
+    mjKRV = planner.operation_kill_rel_vel
+
+    mjKRV.time_selector.time_reference = mj.TimeReference.closest_approach
+    mjKRV.make_node()
+    executeNextNode(conn, tolerance, leadTime)
