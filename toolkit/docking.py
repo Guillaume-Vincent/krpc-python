@@ -131,6 +131,7 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
 
     """
     sc = conn.space_center
+    sc.active_vessel = vessel
 
     sc.target_docking_port = targetDP
 
