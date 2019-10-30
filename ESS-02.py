@@ -40,7 +40,7 @@ def ascent_guidance(heading):
     srfSpeed.remove()
     ap.target_pitch = 75.0
     sleep(0.5)
-    
+
     while ssa() < 0.1:
         twrRegulation(vessel, meanAltitude, thrust,
                       vesselMass, throttle, twrMax=2.5)
