@@ -1,6 +1,7 @@
 """Perform a docking maneuver."""
 
 from numpy import sign
+from toolkit.calculations import length
 
 
 def xPosControl(vessel, xTarg, xPos, xVlc, vcu):
@@ -25,9 +26,9 @@ def xPosControl(vessel, xTarg, xPos, xVlc, vcu):
         elif vcu != 0.0:
             vessel.control.up = 0.0
     else:
-        if xVlc > 0.05:
+        if xVlc > 0.07:
             vessel.control.up = -1.0
-        elif xVlc < -0.05:
+        elif xVlc < -0.07:
             vessel.control.up = 1.0
         elif vcu != 0.0:
             vessel.control.up = 0.0
@@ -55,9 +56,9 @@ def yPosControl(vessel, yTarg, yPos, yVlc, vcf):
         elif vcf != 0.0:
             vessel.control.forward = 0.0
     else:
-        if yVlc > 0.05:
+        if yVlc > 0.07:
             vessel.control.forward = 1.0
-        elif yVlc < -0.05:
+        elif yVlc < -0.07:
             vessel.control.forward = -1.0
         elif vcf != 0.0:
             vessel.control.forward = 0.0
@@ -85,9 +86,9 @@ def zPosControl(vessel, zTarg, zPos, zVlc, vcr):
         elif vcr != 0.0:
             vessel.control.right = 0.0
     else:
-        if zVlc > 0.05:
+        if zVlc > 0.07:
             vessel.control.right = 1.0
-        elif zVlc < -0.05:
+        elif zVlc < -0.07:
             vessel.control.right = -1.0
         elif vcr != 0.0:
             vessel.control.right = 0.0
@@ -204,3 +205,55 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
             vessel.control.forward = 0.2
         elif vcf() != 0.0:
             vessel.control.forward = 0.0
+
+    # Removing streams
+    ut.remove()
+    vcu.remove()
+    vcr.remove()
+    vcf.remove()
+    vPos.remove()
+    vVlc.remove()
+    DPState.remove()
+
+
+def moveXFromTarget(conn, vessel, target, tgtDistance):
+    """Move the vessel to a specific distance of the target (min=400m)."""
+    sc = conn.space_center
+    trf = target.orbital_reference_frame
+
+    ut = conn.add_stream(getattr, sc, 'ut')
+    vesselPos = conn.add_stream(vessel.position, trf)
+    speed = conn.add_stream(getattr, vessel.flight(trf), 'speed')
+
+    sc.target_vessel = target
+    vessel.control.sas = True
+    vessel.control.rcs = True
+    vessel.control.speed_mode = sc.SpeedMode.target
+
+    ut0 = ut()
+    while ut() < (ut0 + 1.0):
+        pass
+    vessel.control.sas_mode = sc.SASMode.target
+
+    while ut() < (ut0 + 16.0):
+        pass
+
+    tgtDistance = max(200.0, tgtDistance)
+    if length(vesselPos()) > (4 * tgtDistance):
+        vessel.control.throttle = 0.3
+        while speed() < 20.0:
+            pass
+        vessel.control.throttle = 0.0
+        vessel.control.sas_mode = sc.SASMode.retrograde
+
+        while length(vesselPos()) > tgtDistance:
+            pass
+        vessel.control.throttle = 0.1
+
+        while speed() > 0.3:
+            pass
+        vessel.control.throttle = 0.0
+
+    ut.remove()
+    vesselPos.remove()
+    speed.remove()
