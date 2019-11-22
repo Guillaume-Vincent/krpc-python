@@ -26,9 +26,9 @@ def xPosControl(vessel, xTarg, xPos, xVlc, vcu):
         elif vcu != 0.0:
             vessel.control.up = 0.0
     else:
-        if xVlc > 0.07:
+        if xVlc > 0.06:
             vessel.control.up = -1.0
-        elif xVlc < -0.07:
+        elif xVlc < -0.06:
             vessel.control.up = 1.0
         elif vcu != 0.0:
             vessel.control.up = 0.0
@@ -56,9 +56,9 @@ def yPosControl(vessel, yTarg, yPos, yVlc, vcf):
         elif vcf != 0.0:
             vessel.control.forward = 0.0
     else:
-        if yVlc > 0.07:
+        if yVlc > 0.06:
             vessel.control.forward = 1.0
-        elif yVlc < -0.07:
+        elif yVlc < -0.06:
             vessel.control.forward = -1.0
         elif vcf != 0.0:
             vessel.control.forward = 0.0
@@ -86,9 +86,9 @@ def zPosControl(vessel, zTarg, zPos, zVlc, vcr):
         elif vcr != 0.0:
             vessel.control.right = 0.0
     else:
-        if zVlc > 0.07:
+        if zVlc > 0.06:
             vessel.control.right = 1.0
-        elif zVlc < -0.07:
+        elif zVlc < -0.06:
             vessel.control.right = -1.0
         elif vcr != 0.0:
             vessel.control.right = 0.0
@@ -134,7 +134,9 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
     sc = conn.space_center
     sc.active_vessel = vessel
 
-    sc.target_docking_port = targetDP
+    vessel.parts.controlling = vesselDP.part
+    sc.target_vessel = target
+    #sc.target_docking_port = targetDP
 
     targetObtRefFrame = target.orbital_reference_frame
     refFrame = sc.ReferenceFrame.create_hybrid(
@@ -157,19 +159,19 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
 
     ut0 = ut()
     vessel.control.rcs = True
-    while ut() < (ut0 + 10.0):
+    while ut() < (ut0 + 20.0):
         pass
 
-    # Station avoidace system RAJOUTER LE TIMER
+    # Station avoidace system
     if vPos()[1] < 0:
         var = {abs(vPos()[0]): 'x', abs(vPos()[2]): 'z'}
         maxPos = var.get(max(var))
         if maxPos == 'x':
-            xTarg = 40.0 * sign(vPos()[0])
+            xTarg = 50.0 * sign(vPos()[0])
             zTarg = 0.0
         else:
             xTarg = 0.0
-            zTarg = 40.0 * sign(vPos()[2])
+            zTarg = 50.0 * sign(vPos()[2])
         yTarg = 0.0
 
         timer = ut()
@@ -186,7 +188,7 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
     # Positionning in front of target DP
     timer = ut()
     xTarg = 0.0
-    yTarg = 40.0
+    yTarg = 50.0
     zTarg = 0.0
     while timer > (ut() - 5):
         xPosControl(vessel, xTarg, vPos()[0], vVlc()[0], vcu())
@@ -206,6 +208,11 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
         elif vcf() != 0.0:
             vessel.control.forward = 0.0
 
+    vessel.control.rcs = False
+    while DPState() != sc.DockingPortState.docked:
+        pass
+    
+
     # Removing streams
     ut.remove()
     vcu.remove()
@@ -217,7 +224,7 @@ def dockVesselWithTarget(conn, vessel, target, vesselDP, targetDP):
 
 
 def moveXFromTarget(conn, vessel, target, tgtDistance):
-    """Move the vessel to a specific distance of the target (min=400m)."""
+    """Move the vessel to a specific distance of the target (min=600m)."""
     sc = conn.space_center
     trf = target.orbital_reference_frame
 
@@ -238,9 +245,9 @@ def moveXFromTarget(conn, vessel, target, tgtDistance):
     while ut() < (ut0 + 16.0):
         pass
 
-    tgtDistance = max(200.0, tgtDistance)
-    if length(vesselPos()) > (4 * tgtDistance):
-        vessel.control.throttle = 0.3
+    tgtDistance = max(300.0, tgtDistance)
+    if length(vesselPos()) > (2 * tgtDistance):
+        vessel.control.throttle = 0.2
         while speed() < 20.0:
             pass
         vessel.control.throttle = 0.0
