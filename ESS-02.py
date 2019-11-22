@@ -59,7 +59,7 @@ def ascent_guidance(heading):
     secEngine = getPartsByTag(vessel, 'Second Engine')[0]
     activeEngine = mainEngine
 
-    while apoapsisAlt() < tgtObt:
+    while (apoapsisAlt() < tgtObt) or (meanAltitude() < 70000.0):
 
         if (meanAltitude() < 70000.0) and (apoapsisAlt() < 0.95 * tgtObt):
             twrMax = 2.5
@@ -79,6 +79,7 @@ def ascent_guidance(heading):
         if firstStageSeparated is False:
             if liquidFuel() < 0.1:
                 liquidFuel.remove()
+                vessel.control.throttle = 0.0
                 vessel.control.activate_next_stage()
                 firstStageSeparated = True
                 activeEngine = secEngine
@@ -92,6 +93,10 @@ def ascent_guidance(heading):
                 activeEngine.engine.thrust_limit = 0.05
                 reached95 = True
 
+    if fairingDeployed is False:
+        deployFairing(vessel)
+        fairingDeployed = True
+
     thrust.remove()
     throttle.remove()
     vesselMass.remove()
@@ -104,6 +109,7 @@ def ascent_guidance(heading):
 
     sleep(1.0)
     activeEngine.engine.thrust_limit = 1.0
+    vessel.control.toggle_action_group(1)  # Deploy minor solar panels
 
 
 def reachOrbit():
@@ -178,6 +184,9 @@ def transferOrbit():
         transferOrbit()
     else:
         executeNextNode(conn, tolerance=0.001, leadTime=5)
+        if sc.target_vessel is None:
+            sc.target_vessel = ess
+            sleep(1.0)
         manKillRelVel(conn, tolerance=0.01, leadTime=5)
 
 
@@ -193,6 +202,7 @@ def releasePayload():
 def launch():
     """Execute the mission, from launch to orbit."""
     global vessel
+    sc.target_vessel = ess
     dir = vesselOnTargetPlane(conn, vessel, ess)
     if dir == "north":
         heading = 30
@@ -207,24 +217,36 @@ def launch():
     reachOrbit()
     transferOrbit()
     moveXFromTarget(conn, vessel, ess, tgtDistance=200.0)
+    sleep(1)
     releasePayload()
 
-    vessel = findVessel(conn, "ESS-02 Station")
-    if vessel is not None:
-        vesselChangeName(vessel, "ESS-02")
-        vesselChangeType(vessel, sc.VesselType.station)
+    vessel = findVessel(conn, vesselName + " Station")
+    if vessel is None:
+        vessel = findVessel(conn, vesselName + " Probe")
+    if vessel is None:
+        vessel = findVessel(conn, vesselName + " Relay")
 
-    vesselDP = getPartsByTag(vessel, "DP-up")[0].docking_port
-    essDP = getPartsByTag(ess, "DP-up")[0].docking_port
+    vesselChangeName(vessel, vesselName)
+    vesselChangeType(vessel, sc.VesselType.station)
+    sc.active_vessel = vessel
+
+    for dp in vessel.parts.docking_ports:
+        if dp.part.tag != "":
+            tag = dp.part.tag
+            vesselDP = dp
+            break
+
+    essDP = getPartsByTag(ess, tag)[0].docking_port
     dockVesselWithTarget(conn, vessel, ess, vesselDP, essDP)
 
 
 ###############################################################################
 
 
-conn = krpc.connect(name="ESS-02")
+conn = krpc.connect(name="ESS")
 sc = conn.space_center
 vessel = sc.active_vessel
+vesselName = vessel.name
 ap = vessel.auto_pilot
 ap.disengage()
 
@@ -238,7 +260,6 @@ srf_rf = conn.space_center.ReferenceFrame.create_hybrid(
     rotation=vessel.surface_reference_frame)
 
 ess = findVessel(conn, "ESS")
-sc.target_vessel = ess
 
 ut = conn.add_stream(getattr, sc, 'ut')
 ssa = conn.add_stream(getattr, vessel.flight(K_rf), 'sideslip_angle')
@@ -255,3 +276,6 @@ essPos = conn.add_stream(ess.position, K_nrrf)
 tgtObt = 250000.0
 
 launch()
+
+conn.close()
+sleep(1.0)

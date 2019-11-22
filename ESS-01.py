@@ -71,6 +71,7 @@ def ascentGuidance():
         if firstStageSeparated is False:
             if liquidFuel() < 0.1:
                 liquidFuel.remove()
+                vessel.control.throttle = 0.0
                 vessel.control.activate_next_stage()
                 firstStageSeparated = True
                 activeEngine = secEngine
@@ -84,6 +85,10 @@ def ascentGuidance():
                 activeEngine.engine.thrust_limit = 0.05
                 reached95 = True
 
+    if fairingDeployed is False:
+        deployFairing(vessel)
+        fairingDeployed = True
+
     thrust.remove()
     throttle.remove()
     vesselMass.remove()
@@ -96,7 +101,7 @@ def ascentGuidance():
 
     sleep(1.0)
     activeEngine.engine.thrust_limit = 1.0
-
+    vessel.control.toggle_action_group(1)  # Deploy minor solar panels
 
 def reachOrbit():
     """Control the vessel to reach the correct orbit."""
@@ -155,3 +160,6 @@ meanAltitude = conn.add_stream(getattr, vessel.flight(), 'mean_altitude')
 tgtobt = 500000.0
 
 launch()
+
+conn.close()
+sleep(1.0)
