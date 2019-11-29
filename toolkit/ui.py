@@ -1,7 +1,5 @@
 """Regroup all functions related to creating and managing the in-game UI."""
 
-import krpc
-
 
 class Panel:
     """Used to create a panel and its components."""
@@ -88,7 +86,6 @@ class Panel:
 
         button.rect_transform.size = size
         button.rect_transform.position = position
-        button.text = text
 
     def addInputField(self, name, size, position):
         """Add an input field to the panel.
@@ -124,18 +121,3 @@ class Panel:
 
     def __repr__(self):
         return ("<Panel : " + self.title + ">")
-
-
-conn = krpc.connect(address='192.168.1.27')
-vessel = conn.space_center.active_vessel
-exitCondition = conn.add_stream(getattr, vessel.control, 'throttle')
-
-mainMenu = Panel(conn, (500, 750), (0, 0), 20, 25, 'Main Menu', 50)
-for n in range(0, 15):
-    mainMenu.addLine("Hello, this is line n°" + str(n+1))
-print(mainMenu)
-
-while exitCondition() == 0.0:
-    pass
-
-mainMenu.remove()

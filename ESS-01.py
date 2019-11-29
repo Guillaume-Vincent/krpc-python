@@ -103,6 +103,7 @@ def ascentGuidance():
     activeEngine.engine.thrust_limit = 1.0
     vessel.control.toggle_action_group(1)  # Deploy minor solar panels
 
+
 def reachOrbit():
     """Control the vessel to reach the correct orbit."""
     manPeriapsis(conn, tgtobt, atApsis='apoapsis', tolerance=0.001)
