@@ -117,3 +117,21 @@ def vesselDeorbit(conn, vessel):
     ut.remove()
     thrust.remove()
     periapsisAlt.remove()
+
+
+def getVesselPitch(vesselDirection):
+    """Return the current pitch angle of the vessel.
+
+    Args:
+    -vesselDirection : stream of the direction of the vessel in a surface rf
+
+    """
+    vDir = vesselDirection()
+    # Get the direction of the vessel in the horizon plane
+    horizon_direction = (0, vDir[1], vDir[2])
+
+    # Compute the pitch
+    pitch = angle(vDir, horizon_direction)
+    if vDir[0] < 0:
+        pitch = -pitch
+    return pitch
