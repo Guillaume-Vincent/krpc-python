@@ -1,4 +1,4 @@
-"""Quick python script designed to run every mission one by one."""
+"""Quick python script designed to run ESS mission files one by one."""
 
 import krpc
 from time import sleep
