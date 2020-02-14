@@ -1,4 +1,5 @@
 """Regroup all miscellanous functions."""
+from time import sleep
 
 
 def countdown(conn, t):
@@ -50,3 +51,13 @@ def findVessel(conn, vesselName):
         if V.name == vesselName:
             return V
     return None
+
+
+def wait(conn, waitTime):
+    """Wait for a certain in game time (in seconds)."""
+    ut = conn.add_stream(getattr, conn.space_center, 'ut')
+    T0 = ut()
+    
+    while ut() < T0 + waitTime:
+        sleep(0.01)
+    
