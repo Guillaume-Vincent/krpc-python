@@ -33,6 +33,17 @@ def relativeError(realValue, targetValue):
     return relErr
 
 
+def getUtSlice(ut, factor):
+    """Divide the rotational period of Kerbin into a number of slices.
+    
+    Return the number of slices elapsed since T0.
+    """
+    kerbinRotationalPeriod = 21549.42578125
+
+    slice = ut // (kerbinRotationalPeriod / factor)
+    return slice
+
+
 def getOrbitalPeriod(sma, mu):
     """Return the orbital period of a vessel, using the semi major axis."""
     period = 2 * math.pi * math.sqrt(sma**3 / mu)
