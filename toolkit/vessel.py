@@ -6,6 +6,11 @@ except ModuleNotFoundError:
     from calculations import angle, getKerbinLocalGravity
 
 
+def toggleLights(vessel):
+    """Toggle vessel lights."""
+    vessel.control.lights = not vessel.control.lights
+    
+
 def deployAntennas(vessel):
     """Deploy each deployable antenna on the vessel."""
     for antenna in vessel.parts.antennas:
@@ -34,6 +39,17 @@ def deployFairing(vessel):
     for f in vessel.parts.fairings:
         f.jettison()
 
+
+def activateGPS(vessel, GPSPartTag='GNSS'):
+    """Activate the GPS transmitter.
+    
+    Only to be used with 'Kerbal GPS' mod.
+    """
+    transmitters = getPartsByTag(vessel, GPSPartTag)
+    for part in transmitters:
+        for mod in part.modules:
+            if mod.has_event("Turn on GPS"):
+                mod.trigger_event("Turn on GPS")
 
 def getPartsByName(vessel, partName):
     """Return a list of all the parts named 'partName' of the vessel."""
@@ -88,7 +104,7 @@ def twrRegulation(vessel, meanAltitude, thrust, vesselMass, throttle, twrMax):
             vessel.control.throttle += abs(twr - twrMax) / 10
 
 
-def vesselDeorbit(conn, vessel):
+def vesselDeorbit(conn, vessel, rcs=True):
     """Deorbit the vessel and change its type to debris."""
     ut = conn.add_stream(getattr, conn.space_center, 'ut')
     thrust = conn.add_stream(getattr, vessel, 'thrust')
@@ -97,11 +113,12 @@ def vesselDeorbit(conn, vessel):
     vessel.control.rcs = True
     vessel.control.sas = True
 
-    ut0 = ut()
-    vessel.control.forward = -1.0
-    while ut() < (ut0 + 10.0):
-        pass
-    vessel.control.rcs = False
+    if rcs == True:
+        ut0 = ut()
+        vessel.control.forward = -1.0
+        while ut() < (ut0 + 10.0):
+            pass
+        vessel.control.rcs = False
 
     ut0 = ut()
     vessel.control.sas_mode = conn.space_center.SASMode.retrograde
