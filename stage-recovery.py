@@ -138,7 +138,7 @@ def propulsiveLanding():
 
 
 # Establishing connection
-conn = krpc.connect(name="PropulsiveLanding")
+conn = krpc.connect(name="Stage Recovery")
 sc = conn.space_center
 vessel = sc.active_vessel
 ap = vessel.auto_pilot
