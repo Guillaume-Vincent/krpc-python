@@ -13,7 +13,7 @@ Mods used :
 -SCANSat
 -StationPartsExpansionRedux
 
-Craft file >>> "Orlando.craft"
+Craft file >>> "Orlando-GPS.craft"
 
 """
 import krpc
@@ -203,6 +203,6 @@ for orbitNum in range(1, satNumber + 1):
     deploySatellites()
     vesselDeorbit(conn, vessel, rcs=False)
     
-    sc.launch_vessel('VAB', 'Orlando', 'LaunchPad')
+    sc.launch_vessel('VAB', 'Orlando-GPS', 'LaunchPad')
     conn.close()
     sleep(10)
